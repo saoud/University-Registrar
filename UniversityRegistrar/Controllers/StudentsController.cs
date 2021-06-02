@@ -58,7 +58,35 @@ namespace UniversityRegistrar.Controllers
           _db.CourseStudents.Add(new CourseStudent() { StudentId=student.StudentId, CourseId=courseId });
         }
         _db.SaveChanges();
+        return RedirectToAction("Details", new { id = student.StudentId });
+      }
+
+
+      public ActionResult Delete(int id)
+      {
+        Student thisStudent = _db.Students.FirstOrDefault(student => student.StudentId == id);
+        return View(thisStudent);
+      }
+
+      [HttpPost, ActionName("Delete")]
+      public ActionResult DeleteConfirmed(int id)
+      {
+        Student thisStudent = _db.Students.FirstOrDefault(student => id == student.StudentId);
+        if (id != 0)
+        {
+          _db.Students.Remove(thisStudent);
+        }
+        _db.SaveChanges();
         return RedirectToAction("Index");
+      }
+
+      [HttpPost]
+      public ActionResult DropCourse(int joinId, int studentId)
+      {
+        CourseStudent joinEntry = _db.CourseStudents.FirstOrDefault(entry => entry.CourseStudentId == joinId);
+        _db.CourseStudents.Remove(joinEntry);
+        _db.SaveChanges();
+        return RedirectToAction("Details", new {id = studentId});
       }
     }
   }

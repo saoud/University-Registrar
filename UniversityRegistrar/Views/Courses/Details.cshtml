@@ -9,9 +9,25 @@
 <h2>@Model.CourseNumber</h2>
 
 <h3>Students enrolled:</h3>
+
+@if (Model.JoinEntities.Count == 0)
+{
+  <p>No students have enrolled in this course yet.</p>
+}
 <ul>
   @foreach(CourseStudent join in Model.JoinEntities)
   {
-    <li>@Html.ActionLink(join.Student.Name, "Details", "Student", new { id = join.Student.StudentId})</li>
+    <li>@Html.ActionLink(join.Student.Name, "Details", "Students", new { id = join.Student.StudentId})</li>
+    @using (Html.BeginForm("DropStudent", "Courses"))
+    {
+      @Html.Hidden("courseId", join.CourseId)
+      @Html.Hidden("joinId", join.CourseStudentId)
+      <input type="submit" value="Drop student" />
+    }
   }
 </ul>
+
+<p>@Html.ActionLink("Enroll student", "AddStudent", new { id = Model.CourseId })</p>
+<p>@Html.ActionLink("Delete Course", "Delete", new { id = Model.CourseId })</p>
+<p>@Html.ActionLink("Back to courses", "Index")</p>
+<p>@Html.ActionLink("Back to home", "Index", "Home")</p>

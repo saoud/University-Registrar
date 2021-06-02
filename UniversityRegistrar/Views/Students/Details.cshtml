@@ -1,0 +1,31 @@
+@{
+  Layout = "_Layout";
+}
+
+@using UniversityRegistrar.Models;
+@model UniversityRegistrar.Models.Student;
+
+<h1>@Model.Name</h1>
+<h3>Enrollment date: @Model.DateOfEnrollment.ToShortDateString()</h3>
+
+@if (Model.JoinEntities.Count == 0)
+{
+  <p>@Model.Name is currently enrolled in no courses.</p>
+}
+<ul>
+@foreach (CourseStudent join in Model.JoinEntities)
+{
+  <li>@Html.ActionLink($"{join.Course.CourseNumber}: {join.Course.Name}", "Details", "Courses", new { id = join.Course.CourseId })</li>
+  @using (Html.BeginForm("DropCourse", "Students"))
+  {
+    @Html.Hidden("studentId", Model.StudentId)
+    @Html.Hidden("joinId", join.CourseStudentId)
+    <input type="submit" value="Drop course" />
+  }
+}
+</ul>
+
+<p>@Html.ActionLink("Enroll in course", "AddCourse", new { id = Model.StudentId })</p>
+<p>@Html.ActionLink("Delete student", "Delete", new { id = Model.StudentId })</p>
+<p>@Html.ActionLink("Back to students", "Index")</p>
+<p>@Html.ActionLink("Back to home", "Index", "Home")</p>

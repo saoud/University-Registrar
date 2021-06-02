@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using UniversityRegistrar.Models;
 
 namespace UniversityRegistrar.Controllers 
@@ -29,8 +30,11 @@ namespace UniversityRegistrar.Controllers
       [HttpPost]
       public ActionResult Create(Course course)
       {
-        _db.Courses.Add(course);
-        _db.SaveChanges();
+        if (String.IsNullOrWhiteSpace(course.Name) == false && String.IsNullOrWhiteSpace(course.CourseNumber) == false)
+        {
+          _db.Courses.Add(course);
+          _db.SaveChanges();
+        }
         return RedirectToAction("Index");
       }
       
@@ -58,7 +62,34 @@ namespace UniversityRegistrar.Controllers
           _db.CourseStudents.Add(new CourseStudent() { StudentId=studentId, CourseId=course.CourseId });
         }
         _db.SaveChanges();
+        return RedirectToAction("Details", new { id = course.CourseId });
+      }
+
+      public ActionResult Delete(int id)
+      {
+        Course thisCourse = _db.Courses.FirstOrDefault(course => course.CourseId == id);
+        return View(thisCourse);
+      }
+
+      [HttpPost, ActionName("Delete")]
+      public ActionResult DeleteConfirmed(int id)
+      {
+        Course thisCourse = _db.Courses.FirstOrDefault(course => id == course.CourseId);
+        if (id != 0)
+        {
+          _db.Courses.Remove(thisCourse);
+        }
+        _db.SaveChanges();
         return RedirectToAction("Index");
+      }
+
+      [HttpPost]
+      public ActionResult DropStudent(int joinId, int courseId)
+      {
+        CourseStudent joinEntry = _db.CourseStudents.FirstOrDefault(entry => entry.CourseStudentId == joinId);
+        _db.CourseStudents.Remove(joinEntry);
+        _db.SaveChanges();
+        return RedirectToAction("Details", new { id = courseId });
       }
     }
   }
